@@ -42,7 +42,7 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public LoanDto fetchLoan(String mobileNumber) {
-        Loan loan = loanRepository.findByLoanNumber(mobileNumber).orElseThrow(
+        Loan loan = loanRepository.findByMobileNumber(mobileNumber).orElseThrow(
                 () -> new ResourceNotFoundException("Loan", "mobileNumber", mobileNumber)
         );
         return LoanMapper.convertToDto(loan, new LoanDto());
