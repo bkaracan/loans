@@ -12,6 +12,7 @@
   <groupId>com.bkaracan</groupId>
   <artifactId>loans</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
   <name>loans</name>
   <description>Microservice for loans</description>
   <properties>
@@ -70,7 +71,7 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
           <image>
-            <builder>paketobuildpacks/builder-jammy-base:latest</builder>
+           <name>bkaracan/${project.artifactId}:s4</name>
           </image>
           <excludes>
             <exclude>
