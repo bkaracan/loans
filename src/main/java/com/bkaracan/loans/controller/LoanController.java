@@ -1,6 +1,7 @@
 package com.bkaracan.loans.controller;
 
 import com.bkaracan.loans.constant.LoanConstant;
+import com.bkaracan.loans.dto.LoanContactInfoDto;
 import com.bkaracan.loans.dto.LoanDto;
 import com.bkaracan.loans.dto.response.ErrorResponseDto;
 import com.bkaracan.loans.dto.response.ResponseDto;
@@ -14,6 +15,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +33,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
-@AllArgsConstructor
 @Validated
+@RequiredArgsConstructor
 @Tag(
         name = "CRUD REST APIs for Loans in Bank",
         description = "CRUD REST APIs in bank to CREATE, UPDATE, FETCH and DELETE loan details"
@@ -38,6 +42,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoanController {
 
     private final LoanService loanService;
+    @Value("${build.version}")
+    private String buildVersion;
+
+    private final Environment environment;
+
+    private final LoanContactInfoDto loanContactInfoDto;
 
     @Operation(
             summary = "Create Loan REST API",
@@ -168,5 +178,75 @@ public class LoanController {
                     .body(new ResponseDto(LoanConstant.STATUS_417, LoanConstant.MESSAGE_417_DELETE));
         }
 
+    }
+
+    @Operation(
+            summary = "Get build information",
+            description = "Get build information that is deployed into loans microservice"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTTP Status OK"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error"
+            )
+    }
+    )
+    @GetMapping("/build-info")
+    public ResponseEntity<String> getBuildInfo() {
+        return ResponseEntity.status(HttpStatus.OK).body(buildVersion);
+    }
+
+    @Operation(
+            summary = "Get Java version",
+            description = "Get Java versions details that is installed into loans microservice"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTTP Status OK"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
+    @GetMapping("/java-version")
+    public ResponseEntity<String> getJavaVersion() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(environment.getProperty("JAVA_HOME"));
+    }
+
+    @Operation(
+            summary = "Get Contact Info",
+            description = "Contact Info details that can be reached out in case of any issues"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTTP Status OK"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    }
+    )
+    @GetMapping("/contact-info")
+    public ResponseEntity<LoanContactInfoDto> getContactInfo() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(loanContactInfoDto);
     }
 }
